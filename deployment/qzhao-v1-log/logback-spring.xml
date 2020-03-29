@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true">
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <property name="LOGDIR" value="logs"></property>
+    <property name="SERVICE_NAME" value="qzhao_v1_log"></property>
+
+    <appender name="ROLLINGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGDIR}/${SERVICE_NAME}-log.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>90</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>utf-8</charset>
+            <Pattern>%d %-5level [%thread] %logger: %msg%n</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ROLLINGFILE_PROD" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGDIR}/${SERVICE_NAME}-prod-log.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>90</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>utf-8</charset>
+            <Pattern>%d %-5level [%thread] %logger: %msg%n</Pattern>
+        </encoder>
+    </appender>
+
+    <springProfile name="dev">
+        <root level="debug">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+        <logger name="com.qzhao" additivity="false" level="info">
+            <appender-ref ref="ROLLINGFILE"/>
+        </logger>
+    </springProfile>
+
+    <springProfile name="prod">
+        <logger name="com.qzhao" additivity="false" level="info">
+            <appender-ref ref="ROLLINGFILE_PROD"/>
+        </logger>
+    </springProfile>
+</configuration>
