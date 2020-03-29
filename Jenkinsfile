@@ -21,7 +21,7 @@ podTemplate(label: 'builder', containers: [
         stage('Build Docker image') {
             container('docker') {
                 echo '==============================Build Docker Image======================================='
-                docker info
+                sh "docker info"
                 echo '==============================Push Docker Image======================================='
                 
             }
