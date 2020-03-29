@@ -10,7 +10,6 @@ podTemplate(label: 'builder', containers: [
 
   node('builder') {
     try {
-        
 
         stage('Build a Maven project') {
             container('maven') {
