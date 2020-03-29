@@ -1,11 +1,15 @@
-Kibana:
-
-![](deployment/kibana_loglevel.png)
-![](img/01.png)
-![](img/11.png)
 ![](img/1.png)
 ![](img/2.png)
 
+Kibana:
+
+![](deployment/kibana_loglevel.png)
+---
+Github+Jenkins
+![](img/01.png)
+![](img/11.png)
+
+---
 ```
 docker build -t qzhao-v1-log-1.0.0:v1 .
 
