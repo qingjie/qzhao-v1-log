@@ -10,10 +10,11 @@ podTemplate(label: 'builder', containers: [
 
   node('builder') {
     try {
-      
+        echo "----------11111-------"
         git branch: "${BRANCH}", credentialsId: 'git', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
-        def GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
-      
+        echo "----------2222-------"
+        //def GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
+        echo "----------3333-------"
         stage('Build a Maven project') {
             container('maven') {
                 sh "mvn --version"
