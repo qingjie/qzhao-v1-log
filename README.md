@@ -1,13 +1,7 @@
-![](img/1.png)
-![](img/2.png)
 
 Kibana:
 
 ![](deployment/kibana_loglevel.png)
----
-Github+Jenkins
-![](img/01.png)
-![](img/11.png)
 
 ---
 ```
