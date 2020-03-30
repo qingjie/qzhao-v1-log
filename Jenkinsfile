@@ -54,22 +54,22 @@ podTemplate(label: 'builder', containers: [
                   parameters: [
                       [
                           $class: 'ChoiceParameterDefinition',
-                          choices: "Dev\nQA\nProd",
+                          choices: "DEV\nQA\nPROD",
                           name: 'Env'
                       ]
                   ]
               )
               echo "This is a deploy step to ${userInput}"
               //sh "sed -i 's/<BUILD_TAG>/${build_tag}/' k8s.yaml"
-              if (userInput == "Dev") {
+              if (userInput == "DEV") {
                   // deploy dev stuff
-                 echo "======Dev========="
+                 echo "======dev========="
               } else if (userInput == "QA"){
                   // deploy qa stuff
-                 echo "=======QA========"
+                 echo "=======qa========"
               } else {
                   // deploy prod stuff
-                 echo "======prod========="
+                 echo "======PROD========="
               }
     
             }
