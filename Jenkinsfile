@@ -18,7 +18,7 @@ podTemplate(label: 'builder', containers: [
        
        echo "${BRANCH}:----------11111-------:${env.JOB_NAME}"
        
-      
+       git clone git@github.com:qingjie/qzhao-v1-log.git
        git branch: "${BRANCH}", credentialsId: 'qingjie-github', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
        def GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
       
