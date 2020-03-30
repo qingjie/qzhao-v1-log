@@ -1,0 +1,128 @@
+pipeline {
+    agent {
+        kubernetes {
+            yaml """
+            apiVersion: v1
+            kind: Pod
+            spec:
+              containers:
+              - name: "kubectl"
+                args:
+                - "cat"
+                command:
+                - "/bin/sh"
+                - "-c"
+                image: "lachlanevenson/k8s-kubectl:v1.15.9"
+                imagePullPolicy: "IfNotPresent"
+                tty: true
+              - name: "maven"
+                args:
+                - "cat"
+                command:
+                - "/bin/sh"
+                - "-c"
+                image: "maven:3.6.3-jdk-8"
+                imagePullPolicy: "IfNotPresent"
+                tty: true
+              - name: "docker"
+                image: "docker:18.05-dind"
+                imagePullPolicy: "IfNotPresent"
+                securityContext:
+                  privileged: true
+                volumeMounts:
+                - name: docker-graph-storage 
+                  mountPath: /var/lib/docker
+              volumes:
+              - name: docker-graph-storage 
+                emptyDir: {}
+           """
+        }
+    }
+
+    environment {
+        REGISTRY_PREFIX = "651614074412.dkr.ecr.us-east-1.amazonaws.com/"
+    }
+
+    stages {
+        stage("Compile") {
+            steps {
+                container("maven") {
+                    sh "mvn -B -q clean compile test"
+                }
+            }
+        }
+
+        stage("Release") {
+            steps {
+                container("maven") {
+                    script {
+                        def version = sh label: "Load version from POM", script: "mvn -q help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true
+                        def releaseVersion = version.replace("-SNAPSHOT", "")
+                        echo "Release Version: ${releaseVersion}"
+                        def artifaceId = sh label: "Load artifact name", script: "mvn -q help:evaluate -Dexpression=project.artifactId -q -DforceStdout", returnStdout: true
+                        def imageTag = "${REGISTRY_PREFIX}${artifaceId}:${releaseVersion}"
+
+                        def components = releaseVersion.split("\\.")
+                        components[-1] = components[-1].toInteger() + 1
+                        def nextVersion = components.join(".")
+                        echo "Next version: ${nextVersion}"
+
+                        writeFile file: 'release_version.txt', text: releaseVersion
+                        writeFile file: 'next_version.txt', text: nextVersion
+                        writeFile file: 'artifactId.txt', text: artifaceId
+                        writeFile file: 'imageTag.txt', text: imageTag
+
+                        sh label: "Update version in pom.xml", script: "mvn -B -q versions:set -DnewVersion=${releaseVersion}"
+
+                        def deployment = readFile("deployment.yml")
+                        def newDeployment = deployment.replaceAll("(image:[^:]+):.+", '$1:' + releaseVersion)
+                        writeFile file: "deployment.yml", text: newDeployment
+                    }
+                }
+                container("jnlp") {
+                    script {
+                        def releaseVersion = readFile("release_version.txt")
+                        sh label: "Commit", script: "git add pom.xml deployment.yml"
+                        writeFile file: 'commit.msg', text: "Release ${releaseVersion}"
+                        sh label: "Commit", script: "git commit -F commit.msg"
+                        sh label: "Tag the release version", script: "git tag -F commit.msg -a \"release-${releaseVersion}\""
+                    }
+                }
+                container("maven") {
+                    sh label: "Package release version", script: "mvn package"
+                    script {
+                        def nextVersion = readFile("next_version.txt") + "-SNAPSHOT"
+                        def releaseVersion = readFile("release_version.txt")
+                        sh label: "Update version to next development version", script: "mvn -B -q versions:set -DnewVersion=${nextVersion}"
+                        writeFile file: 'commit.msg', text: "Prepare the next development version: ${releaseVersion}"
+                    }
+                }
+                container("jnlp") {
+                    sh label: "Commit", script: "git add pom.xml"
+                    sh label: "Commit", script: "git commit -F commit.msg"
+                    sh 'git config --local credential.helper "!p() { echo username=\\$GIT_USERNAME; echo password=\\$GIT_PASSWORD; }; p"'
+                    withCredentials([usernamePassword(credentialsId: 'github', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                        sh 'git push origin ${BRANCH_NAME} && git push --tags'
+                    }
+                }
+            }
+        }
+
+        stage("Deploy") {
+            steps {
+                container("docker") {
+                    script {
+                        def imageTag = readFile("imageTag.txt")
+                        sh label: "Build docker image", script: "docker build -t " + imageTag + ' $(pwd)'
+                        sh label: "Push image to registry: ${REGISTRY_PREFIX}", script: "docker push ${imageTag}"
+                    }
+                }
+                container("kubectl") {
+                    withKubeConfig([credentialsId: 'key_kube']) {
+                        sh label: "Deploy to kubernetes cluster", script: "kubectl deploy -f deployment.yml"
+                    }
+                }
+            }
+        }
+    }
+}
