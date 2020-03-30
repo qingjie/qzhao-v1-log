@@ -23,6 +23,8 @@ podTemplate(label: 'builder', containers: [
       
        stage('Clone') {
          echo "1.Clone Stage"
+         echo "-----"
+         which git
          //git url: "https://github.com/qingjie/qzhao-v1-log.git"
          //script {
            //build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
