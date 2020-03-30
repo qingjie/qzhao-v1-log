@@ -34,9 +34,22 @@ podTemplate(label: 'builder', containers: [
         stage('Deploy to Kubernetes'){
             container('kubectl') {
                 
-                echo '==========================Deploying Image======================================'
+              echo '==========================Deploying Image======================================'
                
 
+            )
+            def userInput = input(
+                id: 'userInput',
+                message: 'Choose a deploy environment',
+                parameters: [
+                    [
+                        $class: 'ChoiceParameterDefinition',
+                        choices: "Dev\nQA\nProd",
+                        name: 'Env'
+                    ]
+                ]
+            )
+            echo "This is a deploy step to ${userInput}"
             }
         }
 
