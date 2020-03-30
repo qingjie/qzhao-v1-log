@@ -33,8 +33,9 @@ podTemplate(label: 'builder', containers: [
       
       stage('Push') {
         echo "4.Push Docker Image Stage"
-        withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
-            //sh "docker login -u ${dockerHubUser} -p ${dockerHubPassword}"
+        withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'Password', usernameVariable: 'Username')]) {
+            
+            sh "docker login -u ${Username} -p ${Password}"
             //sh "docker push cnych/jenkins-demo:${build_tag}"
         }
       }
