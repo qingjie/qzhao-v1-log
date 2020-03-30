@@ -24,7 +24,7 @@ podTemplate(label: 'builder', containers: [
       
        stage('Clone') {
          echo "1.Clone Stage"
-         echo "-----"
+         
          git version
          //git url: "https://github.com/qingjie/qzhao-v1-log.git"
          //script {
@@ -36,12 +36,6 @@ podTemplate(label: 'builder', containers: [
           echo "2.Test Stage"
         }
       
-        echo "----------11111-------"
-        //${env.JOB_NAME}
-        //git branch: "${BRANCH}", credentialsId: 'git', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
-        echo "----------2222-------"
-        //def GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
-        echo "----------3333-------"
         stage('Build a Maven project') {
             container('maven') {
                 sh "mvn --version"
