@@ -24,7 +24,11 @@ podTemplate(label: 'builder', containers: [
       
        stage('Clone') {
          echo "1.Clone Stage"
-         
+         container('docker') {
+           docker.withRegistry("https://hub.docker.com", 'docker-registry-credentials') {
+             
+           }
+         }
          git version
          //git url: "https://github.com/qingjie/qzhao-v1-log.git"
          //script {
