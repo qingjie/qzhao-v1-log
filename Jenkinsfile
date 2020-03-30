@@ -10,7 +10,10 @@ podTemplate(label: 'builder', containers: [
 
   node('builder') {
     try {
-        
+       
+       git branch: "${BRANCH}", credentialsId: 'git', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
+       def GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
+      
        stage('Clone') {
          echo "1.Clone Stage"
          git url: "https://github.com/qingjie/qzhao-v1-log.git"
@@ -39,13 +42,13 @@ podTemplate(label: 'builder', containers: [
             container('docker') {
                 echo '==============================Build Docker Image======================================='
                 
-                sh "docker build -t qzhao/qzhao-v1-log-1.0.0:v1 ."
-                sh "docker tag qzhao-v1-log-1.0.0:v1 qingjiezhao/qzhao-v1-log:${build_tag}"
+                //sh "docker build -t qzhao/qzhao-v1-log-1.0.0:v1 ."
+                //sh "docker tag qzhao-v1-log-1.0.0:v1 qingjiezhao/qzhao-v1-log:${build_tag}"
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'Password', usernameVariable: 'Username')]) {
             
                     sh "docker login -u ${Username} -p ${Password}"
                     
-                    sh "docker push qingjiezhao/qzhao-v1-log:${build_tag}"
+                    //sh "docker push qingjiezhao/qzhao-v1-log:${build_tag}"
                 }
                 echo '==============================Push Docker Image======================================='
                 
