@@ -31,7 +31,16 @@ podTemplate(label: 'builder', containers: [
             }
         }
       
-        stage('Deploy to Kubernetes'){
+      stage('Push') {
+        echo "4.Push Docker Image Stage"
+        withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+            //sh "docker login -u ${dockerHubUser} -p ${dockerHubPassword}"
+            //sh "docker push cnych/jenkins-demo:${build_tag}"
+        }
+      }
+      
+      
+      stage('Deploy to Kubernetes'){
             container('kubectl') {
                 
               echo '==========================Deploying Image======================================'
