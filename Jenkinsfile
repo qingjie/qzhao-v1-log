@@ -20,7 +20,7 @@ podTemplate(label: 'builder', containers: [
        echo "-----1-----"
        git clone "git@github.com:qingjie/qzhao-v1-log.git"
        echo "-----2-----"
-       git branch: "${BRANCH}", credentialsId: 'qingjie-github', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
+       git branch: "${BRANCH}", credentialsId: 'github-id-id_rsa', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
        def GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
       
        stage('Clone') {
