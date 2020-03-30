@@ -10,6 +10,19 @@ podTemplate(label: 'builder', containers: [
 
   node('builder') {
     try {
+        
+       stage('Clone') {
+        echo "1.Clone Stage"
+        git url: "https://github.com/qingjie/qzhao-v1-log.git"
+          script {
+            build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+          }
+        }
+      
+        stage('Test') {
+          echo "2.Test Stage"
+        }
+      
         echo "----------11111-------"
         //${env.JOB_NAME}
         //git branch: "${BRANCH}", credentialsId: 'git', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
