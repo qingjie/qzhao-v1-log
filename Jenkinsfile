@@ -48,7 +48,7 @@ podTemplate(label: 'builder', containers: [
                   ]
               )
               echo "This is a deploy step to ${userInput}"
-              sh "sed -i 's/<BUILD_TAG>/${build_tag}/' k8s.yaml"
+              //sh "sed -i 's/<BUILD_TAG>/${build_tag}/' k8s.yaml"
               if (userInput == "Dev") {
                   // deploy dev stuff
                  echo "======Dev========="
@@ -60,7 +60,7 @@ podTemplate(label: 'builder', containers: [
                  echo "======prod========="
               }
     
-            
+            }
         }
 
        
