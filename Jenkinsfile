@@ -1,3 +1,8 @@
+def REGISTRY='https://hub.docker.com'
+def ENV='dev'
+def BRANCH='master'
+def APP_NAMESPACE='jenkins'
+
 podTemplate(label: 'builder', containers: [
   containerTemplate(name: 'maven', image: 'maven:alpine', ttyEnabled: true, command: 'cat'),
   containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.10.5', command: 'cat', ttyEnabled: true),
