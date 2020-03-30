@@ -30,8 +30,8 @@ podTemplate(label: 'builder', containers: [
          
          //git url: "https://github.com/qingjie/qzhao-v1-log.git"
          script {
-           echo "-----1-----"
-           git version
+           
+           
            echo "-----2-----"
            build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
            echo "-----3-----"
