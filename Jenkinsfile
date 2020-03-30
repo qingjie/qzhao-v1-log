@@ -30,6 +30,15 @@ podTemplate(label: 'builder', containers: [
                 
             }
         }
+      
+        stage('Deploy to Kubernetes'){
+            container('kubectl') {
+                
+                echo '==========================Deploying Image======================================'
+               
+
+            }
+        }
 
        
     } catch (e) {
