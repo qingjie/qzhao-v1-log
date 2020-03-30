@@ -35,22 +35,32 @@ podTemplate(label: 'builder', containers: [
             container('kubectl') {
                 
               echo '==========================Deploying Image======================================'
-               
 
-            )
-            def userInput = input(
-                id: 'userInput',
-                message: 'Choose a deploy environment',
-                parameters: [
-                    [
-                        $class: 'ChoiceParameterDefinition',
-                        choices: "Dev\nQA\nProd",
-                        name: 'Env'
-                    ]
-                ]
-            )
-            echo "This is a deploy step to ${userInput}"
-            }
+              def userInput = input(
+                  id: 'userInput',
+                  message: 'Choose a deploy environment',
+                  parameters: [
+                      [
+                          $class: 'ChoiceParameterDefinition',
+                          choices: "Dev\nQA\nProd",
+                          name: 'Env'
+                      ]
+                  ]
+              )
+              echo "This is a deploy step to ${userInput}"
+              sh "sed -i 's/<BUILD_TAG>/${build_tag}/' k8s.yaml"
+              if (userInput == "Dev") {
+                  // deploy dev stuff
+                 echo "======Dev========="
+              } else if (userInput == "QA"){
+                  // deploy qa stuff
+                 echo "=======QA========"
+              } else {
+                  // deploy prod stuff
+                 echo "======prod========="
+              }
+    
+            
         }
 
        
