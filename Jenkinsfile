@@ -12,12 +12,12 @@ podTemplate(label: 'builder', containers: [
     try {
         
        stage('Clone') {
-        echo "1.Clone Stage"
-        git url: "https://github.com/qingjie/qzhao-v1-log.git"
-          script {
-            build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-          }
-        }
+         echo "1.Clone Stage"
+         git url: "https://github.com/qingjie/qzhao-v1-log.git"
+         script {
+           build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+         }
+       }
       
         stage('Test') {
           echo "2.Test Stage"
