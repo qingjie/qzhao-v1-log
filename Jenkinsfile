@@ -30,13 +30,17 @@ podTemplate(label: 'builder', containers: [
          
          //git url: "https://github.com/qingjie/qzhao-v1-log.git"
          script {
-           git version
-           build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
            echo "-----1-----"
-           echo build_tag
-           git clone "git@github.com:qingjie/qzhao-v1-log.git"
+           git version
            echo "-----2-----"
+           build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+           echo "-----3-----"
+           echo build_tag
+           echo "-----4-----"
+           git clone "git@github.com:qingjie/qzhao-v1-log.git"
+           echo "-----5-----"
            git branch: "${BRANCH}", credentialsId: 'github-id-id_rsa', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
+           echo "-----6-----"
            def GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
       
          }
