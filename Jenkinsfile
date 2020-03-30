@@ -17,7 +17,7 @@ podTemplate(label: 'builder', containers: [
     try {
        
        echo "${BRANCH}:----------11111-------:${env.JOB_NAME}"
-       git ls-remote -h "qingjie@github.com:qingjie/qzhao-v1-log.git HEAD"
+       
       
        git branch: "${BRANCH}", credentialsId: 'qingjie-github', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
        def GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
