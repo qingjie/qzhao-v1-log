@@ -25,7 +25,7 @@ podTemplate(label: 'builder', containers: [
        stage('Clone') {
          echo "1.Clone Stage"
          container('docker') {
-           docker.withRegistry("https://hub.docker.com", 'docker-registry-credentials') {
+           docker.withRegistry("https://hub.docker.com", 'dockerhub') {
              
            }
          }
