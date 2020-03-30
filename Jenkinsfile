@@ -26,7 +26,8 @@ podTemplate(label: 'builder', containers: [
          echo "1.Clone Stage"
          container('docker') {
            docker.withRegistry("https://hub.docker.com", 'dockerhub') {
-             
+             //sh "docker build -t qzhao/qzhao-v1-log-1.0.0:v1 ."
+             //sh "docker tag qzhao-v1-log-1.0.0:v1 qingjiezhao/qzhao-v1-log:${build_tag}"
            }
          }
          git version
