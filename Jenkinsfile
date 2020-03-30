@@ -29,6 +29,7 @@ podTemplate(label: 'builder', containers: [
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'Password', usernameVariable: 'Username')]) {
             
                     sh "docker login -u ${Username} -p ${Password}"
+                    sh "cat /root/.docker/config.json"
                     //sh "docker push cnych/jenkins-demo:${build_tag}"
                 }
                 echo '==============================Push Docker Image======================================='
