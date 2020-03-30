@@ -17,12 +17,8 @@ podTemplate(label: 'builder', containers: [
     try {
        
        echo "${BRANCH}:----------11111-------:${env.JOB_NAME}"
-       echo "-----1-----"
-       git clone "git@github.com:qingjie/qzhao-v1-log.git"
-       echo "-----2-----"
-       git branch: "${BRANCH}", credentialsId: 'github-id-id_rsa', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
-       def GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
-      
+       
+       
        stage('Clone') {
          echo "1.Clone Stage"
          container('docker') {
@@ -33,9 +29,16 @@ podTemplate(label: 'builder', containers: [
          }
          git version
          //git url: "https://github.com/qingjie/qzhao-v1-log.git"
-         //script {
-           //build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-         //}
+         script {
+           build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+           echo "-----1-----"
+           echo build_tag
+           git clone "git@github.com:qingjie/qzhao-v1-log.git"
+           echo "-----2-----"
+           git branch: "${BRANCH}", credentialsId: 'github-id-id_rsa', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
+           def GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
+      
+         }
        }
       
         stage('Test') {
