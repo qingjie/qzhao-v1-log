@@ -27,9 +27,10 @@ podTemplate(label: 'builder', containers: [
              //sh "docker tag qzhao-v1-log-1.0.0:v1 qingjiezhao/qzhao-v1-log:${build_tag}"
            //}
          //}
-         git version
+         
          //git url: "https://github.com/qingjie/qzhao-v1-log.git"
          script {
+           git version
            build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
            echo "-----1-----"
            echo build_tag
