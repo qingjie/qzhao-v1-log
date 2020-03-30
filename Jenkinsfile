@@ -38,12 +38,14 @@ podTemplate(label: 'builder', containers: [
         stage('Build Docker image') {
             container('docker') {
                 echo '==============================Build Docker Image======================================='
-                sh "docker info"
+                
+                sh "docker build -t qzhao/qzhao-v1-log-1.0.0:${build_tag} ."
+                sh "docker tag qzhao-v1-log-1.0.0:v1 qingjiezhao/qzhao-v1-log:${build_tag}"
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'Password', usernameVariable: 'Username')]) {
             
                     sh "docker login -u ${Username} -p ${Password}"
-                    sh "cat /root/.docker/config.json"
-                    //sh "docker push cnych/jenkins-demo:${build_tag}"
+                    
+                    sh "docker push qingjiezhao/qzhao-v1-log:${build_tag}"
                 }
                 echo '==============================Push Docker Image======================================='
                 
