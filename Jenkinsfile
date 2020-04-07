@@ -31,7 +31,7 @@ podTemplate(label: 'builder', containers: [
                 echo '==============================Build Docker Image======================================='
                 //sh "docker build -t ${env.JOB_NAME}-${ENV}:${GIT_COMMIT} -t ${env.JOB_NAME}-${ENV}:latest ."
                 sh "docker build -t qzhao/qzhao-v1-log-1.0.0:v1 ."
-                sh "docker tag qzhao-v1-log-1.0.0:v1 qingjiezhao/qzhao-v1-log:${GIT_COMMIT}"
+                sh "docker tag qzhao/qzhao-v1-log-1.0.0:v1 qingjiezhao/qzhao-v1-log:${GIT_COMMIT}"
                 echo '==============================Push Docker Image======================================='
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'Password', usernameVariable: 'Username')]){
                     sh "docker login -u ${Username} -p ${Password}"
