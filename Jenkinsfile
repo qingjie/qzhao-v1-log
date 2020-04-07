@@ -20,6 +20,15 @@ podTemplate(label: 'builder', containers: [
        git branch: "${BRANCH}", credentialsId: 'github-id-id_rsa', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
        def GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
        
+       stage('Build a Maven project') {
+            container('maven') {
+                configFileProvider(
+                    [configFile(fileId: '817ee5a8-1a42-48af-a626-25c155d2ee66', variable: 'MAVEN_SETTINGS')]) {
+                        sh 'mvn -s $MAVEN_SETTINGS clean install -Dmaven.test.skip=true'
+                    }
+            }
+        }
+      
        stage('Clone') {
          echo "1.Clone Stage"
          //container('docker') {
