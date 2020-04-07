@@ -1,5 +1,5 @@
 def REGISTRY='https://hub.docker.com'
-def ENV='dev'
+//def ENV='dev'
 def BRANCH='master'
 def APP_NAMESPACE='jenkins'
 
