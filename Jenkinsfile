@@ -44,64 +44,11 @@ podTemplate(label: 'builder', containers: [
             }
         }
       
-       stage('Clone') {
-         echo "1.Clone Stage"
-         //container('docker') {
-           //docker.withRegistry("https://hub.docker.com", 'dockerhub') {
-             //sh "docker build -t qzhao/qzhao-v1-log-1.0.0:v1 ."
-             //sh "docker tag qzhao-v1-log-1.0.0:v1 qingjiezhao/qzhao-v1-log:${build_tag}"
-           //}
-         //}
-         
-         //git url: "https://github.com/qingjie/qzhao-v1-log.git"
-         script {
-           echo "-----1-----"
-           sh "which git"
-           echo "-----2-----"
-           //build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-           echo "-----3-----"
-           //echo build_tag
-           echo "-----4-----"
-           //git clone "git@github.com:qingjie/qzhao-v1-log.git"
-           echo "-----5-----"
-           //git branch: "${BRANCH}", credentialsId: 'github-id-id_rsa', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
-           echo "-----6-----"
-           //def GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
-      
-         }
-       }
-      
-        stage('Test') {
-          echo "2.Test Stage"
-        }
-      
-        stage('Build a Maven project') {
-            container('maven') {
-                sh "mvn --version"
-            }
-        }
+       
+       
 
-        stage('Build Docker image') {
-            container('docker') {
-                echo '==============================Build Docker Image======================================='
-                
-                //sh "docker build -t qzhao/qzhao-v1-log-1.0.0:v1 ."
-                //sh "docker tag qzhao-v1-log-1.0.0:v1 qingjiezhao/qzhao-v1-log:${build_tag}"
-                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'Password', usernameVariable: 'Username')]) {
-            
-                    sh "docker login -u ${Username} -p ${Password}"
-                    
-                    //sh "docker push qingjiezhao/qzhao-v1-log:${build_tag}"
-                }
-                echo '==============================Push Docker Image======================================='
-                
-            }
-        }
-      
-      stage('Push') {
-        echo "4.Push Docker Image Stage"
-        
-      }
+       
+     
       
       
       stage('Deploy to Kubernetes'){
