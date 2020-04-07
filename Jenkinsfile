@@ -22,10 +22,7 @@ podTemplate(label: 'builder', containers: [
        
        stage('Build a Maven project') {
             container('maven') {
-                configFileProvider(
-                    [configFile(fileId: '817ee5a8-1a42-48af-a626-25c155d2ee66', variable: 'MAVEN_SETTINGS')]) {
-                        sh 'mvn -s $MAVEN_SETTINGS clean install -Dmaven.test.skip=true'
-                    }
+               sh "mvn -B -q clean compile test"
             }
         }
       
