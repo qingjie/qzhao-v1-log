@@ -22,7 +22,7 @@ podTemplate(label: 'builder', containers: [
        
        stage('Build a Maven project') {
             container('maven') {
-               sh "mvn -B -q clean compile test"
+               sh "mvn -B -q clean compile test install"
             }
         }
       
