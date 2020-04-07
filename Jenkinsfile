@@ -7,34 +7,34 @@ podTemplate(label: 'builder', containers: [
   containerTemplate(name: 'maven', image: 'maven:alpine', ttyEnabled: true, command: 'cat'),
   containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.10.5', command: 'cat', ttyEnabled: true),
   containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat')
-  ], 
-  serviceAccount: "jenkins", privileged: 'true', 
+  ],
+  serviceAccount: "jenkins", privileged: 'true',
   volumes: [
   hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
   ]) {
 
   node('builder') {
     try {
-       
-       echo "${BRANCH}:----------11111-------:${env.JOB_NAME}"
-       git branch: "${BRANCH}", credentialsId: 'github-id-id_rsa', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
-       def GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
-       
-       stage('Clone') {
+
+      echo "${BRANCH}:----------11111-------:${env.JOB_NAME}"
+      git branch: "${BRANCH}", credentialsId: 'github-id-id_rsa', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
+      def GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
+
+      stage('Clone') {
+        echo "Clone code from github/gitlab"
+      }
+
+      stage('Test') {
             echo "Clone code from github/gitlab"
-       }
-       
-       stage('Test') {
-            echo "Clone code from github/gitlab"
-       }
-      
-       stage('Build a Maven project') {
+      }
+
+      stage('Build a Maven project') {
             container('maven') {
                sh "mvn -B -q clean compile test install"
             }
-       }
-      
-       stage('Build Docker image') {
+      }
+
+      stage('Build Docker image') {
             container('docker') {
                 echo '==============================Build Docker Image======================================='
                 //sh "docker build -t ${env.JOB_NAME}-${ENV}:${GIT_COMMIT} -t ${env.JOB_NAME}-${ENV}:latest ."
@@ -45,20 +45,24 @@ podTemplate(label: 'builder', containers: [
                     sh "docker login -u ${Username} -p ${Password}"
                     //docker.image("${env.JOB_NAME}-${ENV}:${GIT_COMMIT}").push()
                     //docker.image("${env.JOB_NAME}-${ENV}:latest").push()
-                    
-                    
+
+
                     sh "docker push qingjiezhao/qzhao-v1-log:${GIT_COMMIT}"
                 }
             }
-        }
-       
-       stage('Push') {
+      }
+
+      stage('Push') {
             echo "Push to Registry"
-       }
-      
+      }
+
+      stage('YAML') {
+        echo "5. Change YAML File Stage"
+      }
+
       stage('Deploy to Kubernetes'){
             container('kubectl') {
-                
+
               echo '==========================Deploying Image======================================'
 
               def userInput = input(
@@ -84,13 +88,11 @@ podTemplate(label: 'builder', containers: [
                   // deploy prod stuff
                  echo "======PROD========="
               }
-    
+
             }
-        }
-       
+      }
     } catch (e) {
         currentBuild.result = "FAILED"
-        
     }
   }
 }
