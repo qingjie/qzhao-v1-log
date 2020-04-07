@@ -20,11 +20,19 @@ podTemplate(label: 'builder', containers: [
        git branch: "${BRANCH}", credentialsId: 'github-id-id_rsa', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
        def GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
        
+       stage('Clone') {
+            echo "Clone code from github/gitlab"
+       }
+       
+       stage('Test') {
+            echo "Clone code from github/gitlab"
+       }
+      
        stage('Build a Maven project') {
             container('maven') {
                sh "mvn -B -q clean compile test install"
             }
-        }
+       }
       
        stage('Build Docker image') {
             container('docker') {
@@ -43,13 +51,10 @@ podTemplate(label: 'builder', containers: [
                 }
             }
         }
-      
        
-       
-
-       
-     
-      
+       stage('Push') {
+            echo "Push to Registry"
+       }
       
       stage('Deploy to Kubernetes'){
             container('kubectl') {
@@ -82,7 +87,6 @@ podTemplate(label: 'builder', containers: [
     
             }
         }
-
        
     } catch (e) {
         currentBuild.result = "FAILED"
