@@ -33,7 +33,7 @@ podTemplate(label: 'builder', containers: [
            echo "-----1-----"
            sh "which git"
            echo "-----2-----"
-           //build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+           build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
            echo "-----3-----"
            //echo build_tag
            echo "-----4-----"
