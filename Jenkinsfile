@@ -1,5 +1,5 @@
 def REGISTRY='https://hub.docker.com'
-//def ENV='dev'
+def ENV='dev'
 def BRANCH='master'
 def APP_NAMESPACE='jenkins'
 
@@ -23,6 +23,24 @@ podTemplate(label: 'builder', containers: [
        stage('Build a Maven project') {
             container('maven') {
                sh "mvn -B -q clean compile test"
+            }
+        }
+      
+       stage('Build Docker image') {
+            container('docker') {
+                echo '==============================Build Docker Image======================================='
+                //sh "docker build -t ${env.JOB_NAME}-${ENV}:${GIT_COMMIT} -t ${env.JOB_NAME}-${ENV}:latest ."
+                sh "docker build -t qzhao/qzhao-v1-log-1.0.0:v1 ."
+                sh "docker tag qzhao-v1-log-1.0.0:v1 qingjiezhao/qzhao-v1-log:${GIT_COMMIT}"
+                echo '==============================Push Docker Image======================================='
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'Password', usernameVariable: 'Username')])
+                    sh "docker login -u ${Username} -p ${Password}"
+                    //docker.image("${env.JOB_NAME}-${ENV}:${GIT_COMMIT}").push()
+                    //docker.image("${env.JOB_NAME}-${ENV}:latest").push()
+                    
+                    
+                    sh "docker push qingjiezhao/qzhao-v1-log:${GIT_COMMIT}"
+                }
             }
         }
       
