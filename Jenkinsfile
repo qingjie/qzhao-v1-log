@@ -86,7 +86,7 @@ podTemplate(label: 'builder', containers: [
                   // deploy dev stuff
                  echo "======dev========="
                  sh "cat deployment.yaml"
-                 sh "sudo kubectl get pods --all-namespaces"
+                 sh "kubectl version"
                  //sh "kubectl apply -f deployment.yaml"
               } else if (userInput == "QA"){
                   // deploy qa stuff
