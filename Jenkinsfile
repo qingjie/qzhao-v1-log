@@ -2,6 +2,7 @@ def REGISTRY='https://hub.docker.com'
 def ENV='dev'
 def BRANCH='master'
 def APP_NAMESPACE='jenkins'
+def GIT_COMMIT=''
 
 podTemplate(label: 'builder', containers: [
   containerTemplate(name: 'maven', image: 'maven:alpine', ttyEnabled: true, command: 'cat'),
@@ -17,11 +18,11 @@ podTemplate(label: 'builder', containers: [
     try {
 
       echo "${BRANCH}:----------11111-------:${env.JOB_NAME}"
-      def GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
 
       stage('Clone') {
         echo "Clone code from github/gitlab"
         git branch: "${BRANCH}", credentialsId: 'github-id-id_rsa', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
+        GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
       }
 
       stage('Test') {
