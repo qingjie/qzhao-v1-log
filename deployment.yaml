@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qzhao-v1-log
+  labels:
+    app: qzhao
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qzhao
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 33%
+  template:
+    metadata:
+      labels:
+        app: qzhao
+    spec:
+      containers:
+        - name: qzhao
+          image: qingjiezhao/qzhao-v1-log:<VERSION>
+          ports:
+            - containerPort: 8888
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8888
+            initialDelaySeconds: 2
+            periodSeconds: 2
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8888
+            initialDelaySeconds: 2
+            periodSeconds: 2
