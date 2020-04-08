@@ -86,7 +86,8 @@ podTemplate(label: 'builder', containers: [
                   // deploy dev stuff
                  echo "======dev========="
                  sh "cat deployment.yaml"
-                 kubectl cluster-info
+                 
+                 sh "kubectl cluster-info"
                  //kubectl apply -f deployment.yaml
               } else if (userInput == "QA"){
                   // deploy qa stuff
