@@ -87,7 +87,9 @@ podTemplate(label: 'builder', containers: [
                  echo "======dev========="
                  sh "cat deployment.yaml"
                  sh "kubectl version"
-                 sh "kubectl apply -f deployment.yaml"
+                 //sh "kubectl apply -f deployment.yaml"
+                 sh "helm init --client-only"
+                 
               } else if (userInput == "QA"){
                   // deploy qa stuff
                  echo "=======qa========"
