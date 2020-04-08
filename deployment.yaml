@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: qzhao-v1-log
+  namespace: qzhao-v1-log
   labels:
     app: qzhao
 spec:
