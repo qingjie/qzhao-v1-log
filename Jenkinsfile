@@ -88,6 +88,9 @@ podTemplate(label: 'builder', containers: [
                  echo "======dev========="
                  sh "cat deployment.yaml"
                  sh "kubectl version"
+                 sh "kubectl create serviceaccount --namespace kube-system tiller"
+                 sh "kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller"
+                 sh "kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'"
                  //sh "kubectl apply -f deployment.yaml"
                 
                  
