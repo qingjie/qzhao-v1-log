@@ -11,3 +11,7 @@ docker tag qzhao-v1-log-1.0.0:v1 qingjiezhao/qzhao-v1-log:v1
 
 docker run -d -p 8888:8888 -d --name qzhao-v1-log qingjiezhao/qzhao-v1-log:v1
 ```
+
+```
+kubectl create clusterrolebinding permissive-binding --clusterrole=cluster-admin --user=admin --user=kubelet --group=system:serviceaccounts:jenkins
+```
