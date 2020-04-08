@@ -20,24 +20,25 @@ podTemplate(label: 'builder', containers: [
       echo "${BRANCH}:----------11111-------:${env.JOB_NAME}"
 
       stage('Clone') {
-        echo "Clone code from github/gitlab"
+        echo '==========================1. Clone code from github/gitlab================================='
         git branch: "${BRANCH}", credentialsId: 'github-id-id_rsa', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
         GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
       }
 
       stage('Test') {
-        echo "Clone code from github/gitlab"
+        echo '========================================2. Test============================================='
       }
 
       stage('Build a Maven project') {
         container('maven') {
+          echo '==============================3. Build a Maven project===================================='
           sh "mvn -B -q clean compile test install"
         }
       }
 
       stage('Build Docker image') {
         container('docker') {
-          echo '==============================Build Docker Image======================================='
+          echo '==============================4. Build Docker Image======================================='
           //sh "docker build -t ${env.JOB_NAME}-${ENV}:${GIT_COMMIT} -t ${env.JOB_NAME}-${ENV}:latest ."
           sh "docker build -t qzhao/qzhao-v1-log-1.0.0:v1 ."
           sh "docker tag qzhao/qzhao-v1-log-1.0.0:v1 qingjiezhao/qzhao-v1-log:${GIT_COMMIT}"
@@ -45,9 +46,8 @@ podTemplate(label: 'builder', containers: [
       }
 
       stage('Push') {
-        echo "Push to Registry"
         container('docker') {
-          echo '==============================Push Docker Image======================================='
+          echo '==============================5. Push to Registry======================================='
             withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'Password', usernameVariable: 'Username')]){
               sh "docker login -u ${Username} -p ${Password}"
               //docker.image("${env.JOB_NAME}-${ENV}:${GIT_COMMIT}").push()
@@ -57,12 +57,12 @@ podTemplate(label: 'builder', containers: [
             } 
       }
       stage('YAML') {
-        echo "5. Change YAML File Stage"
+        echo '==============================6. Change YAML File Stage====================================='
       }
 
       stage('Deploy to Kubernetes'){
             container('kubectl') {
-              echo '==========================Deploying Image======================================'
+              echo '==========================7. Deploy to Kubernetes======================================'
               def userInput = input(
                   id: 'userInput',
                   message: 'Choose a deploy environment',
