@@ -81,11 +81,12 @@ podTemplate(label: 'builder', containers: [
               echo "This is a deploy step to ${userInput}"
               //sh "sed -i 's/<BUILD_TAG>/${build_tag}/' k8s.yaml"
               sh "sed -i 's/<VERSION>/${GIT_COMMIT}/g' deployment.yaml"
-              cat deployment.yaml
+             
               if (userInput == "DEV") {
                   // deploy dev stuff
                  echo "======dev========="
-                 kubectl apply -f deployment.yaml
+                 sh "cat deployment.yaml"
+                 //kubectl apply -f deployment.yaml
               } else if (userInput == "QA"){
                   // deploy qa stuff
                  echo "=======qa========"
