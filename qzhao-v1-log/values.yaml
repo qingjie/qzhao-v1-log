@@ -5,8 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: nginx
-  tag: stable
+  repository: qingjiezhao/qzhao-v1-log
+  tag: <VERSION>
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
