@@ -6,7 +6,7 @@ def GIT_COMMIT=''
 
 podTemplate(label: 'builder', containers: [
   containerTemplate(name: 'maven', image: 'maven:alpine', ttyEnabled: true, command: 'cat'),
-  containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.10.5', command: 'cat', ttyEnabled: true),
+  containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.15.9', command: 'cat', ttyEnabled: true),
   containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat')
   ],
   serviceAccount: "jenkins", privileged: 'true',
