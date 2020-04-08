@@ -7,7 +7,8 @@ def GIT_COMMIT=''
 podTemplate(label: 'builder', containers: [
   containerTemplate(name: 'maven', image: 'maven:alpine', ttyEnabled: true, command: 'cat'),
   containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.15.9', command: 'cat', ttyEnabled: true),
-  containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat')
+  containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
+  containerTemplate(name: 'helm', image: 'lachlanevenson/k8s-helm:v2.16.5', command: 'cat', ttyEnabled: true)
   ],
   serviceAccount: "jenkins", privileged: 'true',
   volumes: [
@@ -88,9 +89,7 @@ podTemplate(label: 'builder', containers: [
                  sh "cat deployment.yaml"
                  sh "kubectl version"
                  //sh "kubectl apply -f deployment.yaml"
-                 sh "helm init --client-only"
-                 sh "helm version"
-                 sh "helm upgrade qzhao-v1-log ./ --install --set image.tag=${GIT_COMMIT}"
+                
                  
               } else if (userInput == "QA"){
                   // deploy qa stuff
@@ -101,6 +100,15 @@ podTemplate(label: 'builder', containers: [
               }
 
             }
+      }
+      
+      stage('Deploy to Kubernetes with Helm'){
+        container('helm') {
+          echo '==============================7. Helm Stage====================================='
+           sh "helm init --client-only"
+           sh "helm version"
+           sh "helm upgrade qzhao-v1-log ./ --install --set image.tag=${GIT_COMMIT}"
+        }
       }
     } catch (e) {
         currentBuild.result = "FAILED"
