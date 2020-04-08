@@ -17,11 +17,12 @@ podTemplate(label: 'builder', containers: [
     try {
 
       echo "${BRANCH}:----------11111-------:${env.JOB_NAME}"
-      git branch: "${BRANCH}", credentialsId: 'github-id-id_rsa', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
+      
       def GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
 
       stage('Clone') {
         echo "Clone code from github/gitlab"
+        git branch: "${BRANCH}", credentialsId: 'github-id-id_rsa', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
       }
 
       stage('Test') {
@@ -40,20 +41,19 @@ podTemplate(label: 'builder', containers: [
                 //sh "docker build -t ${env.JOB_NAME}-${ENV}:${GIT_COMMIT} -t ${env.JOB_NAME}-${ENV}:latest ."
                 sh "docker build -t qzhao/qzhao-v1-log-1.0.0:v1 ."
                 sh "docker tag qzhao/qzhao-v1-log-1.0.0:v1 qingjiezhao/qzhao-v1-log:${GIT_COMMIT}"
-                echo '==============================Push Docker Image======================================='
-                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'Password', usernameVariable: 'Username')]){
-                    sh "docker login -u ${Username} -p ${Password}"
-                    //docker.image("${env.JOB_NAME}-${ENV}:${GIT_COMMIT}").push()
-                    //docker.image("${env.JOB_NAME}-${ENV}:latest").push()
-
-
-                    sh "docker push qingjiezhao/qzhao-v1-log:${GIT_COMMIT}"
-                }
             }
       }
 
       stage('Push') {
             echo "Push to Registry"
+            container('docker') {
+                echo '==============================Push Docker Image======================================='
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'Password', usernameVariable: 'Username')]){
+                    sh "docker login -u ${Username} -p ${Password}"
+                    //docker.image("${env.JOB_NAME}-${ENV}:${GIT_COMMIT}").push()
+                    //docker.image("${env.JOB_NAME}-${ENV}:latest").push()
+                    sh "docker push qingjiezhao/qzhao-v1-log:${GIT_COMMIT}"
+                }         
       }
 
       stage('YAML') {
