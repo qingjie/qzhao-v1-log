@@ -105,7 +105,7 @@ podTemplate(label: 'builder', containers: [
       stage('Deploy to Kubernetes with Helm'){
         container('helm') {
           echo '==============================7. Helm Stage====================================='
-           helm init --client-only
+           //helm init --client-only
            helm version
            //sh "helm upgrade qzhao-v1-log ./ --install --set image.tag=${GIT_COMMIT}"
         }
