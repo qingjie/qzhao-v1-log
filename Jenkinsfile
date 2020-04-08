@@ -89,6 +89,7 @@ podTemplate(label: 'builder', containers: [
                  sh "kubectl version"
                  //sh "kubectl apply -f deployment.yaml"
                  sh "helm init --client-only"
+                 sh "helm upgrade qzhao-v1-log ./ --install --set image.tag=${GIT_COMMIT}"
                  
               } else if (userInput == "QA"){
                   // deploy qa stuff
