@@ -22,7 +22,8 @@ podTemplate(label: 'builder', containers: [
       stage('Clone') {
         echo '==========================1. Clone code from github/gitlab================================='
         git branch: "${BRANCH}", credentialsId: 'github-id-id_rsa', url: "git@github.com:qingjie/${env.JOB_NAME}.git"
-        GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
+        GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
+        echo "-------------------zhaoqingjie-----:${GIT_COMMIT}"
       }
 
       stage('Test') {
@@ -58,11 +59,14 @@ podTemplate(label: 'builder', containers: [
       }
       stage('YAML') {
         echo '==============================6. Change YAML File Stage====================================='
+        
+        
       }
 
       stage('Deploy to Kubernetes'){
             container('kubectl') {
               echo '==========================7. Deploy to Kubernetes======================================'
+              
               def userInput = input(
                   id: 'userInput',
                   message: 'Choose a deploy environment',
@@ -76,6 +80,8 @@ podTemplate(label: 'builder', containers: [
               )
               echo "This is a deploy step to ${userInput}"
               //sh "sed -i 's/<BUILD_TAG>/${build_tag}/' k8s.yaml"
+              //sh "sed -i 's/<VERSION>/${CI_COMMIT_SHORT_SHA}/g' deployment.yaml"
+              //kubectl apply -f deployment.yaml
               if (userInput == "DEV") {
                   // deploy dev stuff
                  echo "======dev========="
