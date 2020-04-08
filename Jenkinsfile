@@ -109,9 +109,9 @@ podTemplate(label: 'builder', containers: [
         
         container('helm') {
           echo '==============================7. Helm Stage====================================='
-           //helm init --client-only
-           sh "helm list"
-           //sh "helm upgrade qzhao-v1-log ./ --install --set image.tag=${GIT_COMMIT}"
+          sh "helm list"
+          sh "helm init --client-only"
+          sh "helm upgrade qzhao-v1-log ./ --install --set image.tag=${GIT_COMMIT}"
         }
       }
     } catch (e) {
