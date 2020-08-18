@@ -1,0 +1,140 @@
+def ENV='tst'
+def BRANCH='tst'
+def GIT_COMMIT=''
+def DOCKER_REGISTRY='gitlab.americanportfolios.com:4567'
+def PROJECT_NAME='infrastructure/realtime-rebalance'
+def HELM_CHART_NAME='realtime-rebalance'
+def HELM_NAMESPACE='realtime-rebalance'
+def HELM_CHART_PROJECT='k8s-helm-chart'
+
+pipeline {
+  agent {
+        kubernetes {
+            yaml """
+            apiVersion: v1
+            kind: Pod
+            spec:
+              containers:
+              - name: "kubectl"
+                args:
+                - "cat"
+                command:
+                - "/bin/sh"
+                - "-c"
+                image: "lachlanevenson/k8s-kubectl:v1.18.2"
+                imagePullPolicy: "IfNotPresent"
+                tty: true
+              - name: "helm"
+                args:
+                - "cat"
+                command:
+                - "/bin/sh"
+                - "-c"
+                image: "lachlanevenson/k8s-helm:v3.2.4"
+                imagePullPolicy: "IfNotPresent"
+                tty: true
+              - name: "docker"
+                image: "docker:19.03-dind"
+                imagePullPolicy: "IfNotPresent"
+                tty: true
+                securityContext:
+                  privileged: true
+                volumeMounts:
+                - name: jenkins-pvc
+                  mountPath: /var/lib/docker
+              volumes:
+              - name: jenkins-pvc
+                emptyDir: {}
+           """
+        }
+    }
+
+  stages {
+    stage('Clone') {
+      steps {
+        echo '==========================1. Clone code from github/gitlab================================='
+        script {
+            GIT_COMMIT = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
+        }
+
+        echo "---branch--:${BRANCH}:-----------------:${env.JOB_NAME}"
+        echo "======GIT_COMMIT======:${GIT_COMMIT}"
+
+         withCredentials([usernamePassword(credentialsId: 'jenkins-gitlab-user', passwordVariable: 'Password', usernameVariable: 'Username')]){
+            script {
+                sh label: "Git Clone - Helm Chart", script:  "git clone https://$Username:$Password@gitlab.americanportfolios.com/infrastructure/k8s-helm-chart.git"
+                sh label: "List Files", script: "ls -al"
+            }
+        }
+      }
+    }
+
+    stage('Test') {
+      steps {
+        echo '========================================2. Test============================================='
+        echo '=======================================Nothing to test======================================'
+      }
+    }
+
+    stage('Build Docker image') {
+      steps {
+        container('docker') {
+          echo '==============================3. Build Docker Image======================================='
+           script {
+            sh label: "Docker version", script: "docker version"
+            sh label: "Docker tag", script: "docker build --pull -t ${DOCKER_REGISTRY}/${PROJECT_NAME}/${ENV}:${GIT_COMMIT} ."
+           }
+        }
+      }
+    }
+
+    stage('Lint') {
+      steps {
+        echo '========================================4. helm lint chartname============================================='
+        container("helm") {
+            withKubeConfig([credentialsId: 'akstst-id']) {
+                sh label: "Helm version", script: "helm  lint k8s-helm-chart/${BRANCH}/${HELM_CHART_NAME}"
+            }
+        }
+      }
+    }
+
+    stage('Push to Registry') {
+      steps {
+        container('docker') {
+          echo '==============================5. Push to Registry======================================='
+            withCredentials([usernamePassword(credentialsId: 'jenkins-gitlab-user', passwordVariable: 'Password', usernameVariable: 'Username')]){
+              script {
+                sh label: "Docker login", script: "docker login ${DOCKER_REGISTRY} -u $Username -p $Password"
+                sh label: "Docker push", script:  "docker push ${DOCKER_REGISTRY}/${PROJECT_NAME}/${ENV}:${GIT_COMMIT}"
+              }
+            }
+        }
+      }
+    }
+
+    stage('Deploy') {
+      steps {
+        echo '==========================6. Deploy to Kubernetes======================================'
+        container("docker") {
+              script {
+                sh label: "Docker pull", script:  "docker pull ${DOCKER_REGISTRY}/${PROJECT_NAME}/${ENV}:${GIT_COMMIT}"
+              }
+        }
+
+        container("kubectl") {
+            withKubeConfig([credentialsId: 'akstst-id']) {
+                sh label: "Deploy to kubernetes cluster", script: "kubectl get ns"
+            }
+        }
+
+        container("helm") {
+            withKubeConfig([credentialsId: 'akstst-id']) {
+                sh label: "Helm version", script: "helm  version"
+                sh label: "Helm Update", script: "helm upgrade ${HELM_CHART_NAME} ${HELM_CHART_PROJECT}/${ENV}/${HELM_CHART_NAME} -n ${HELM_NAMESPACE} --set image.tag=${GIT_COMMIT}" 
+            }
+        }
+      }
+    }
+  }
+}
